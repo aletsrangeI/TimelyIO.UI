@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const catalogoApi = createApi({
   reducerPath: 'catalogoApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://192.168.0.35/api/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_API_BASE_URL }),
   tagTypes: ['Catalogo'],
   endpoints: (builder) => ({
     insertCatalogo: builder.mutation({

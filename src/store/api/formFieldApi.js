@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const formFieldApi = createApi({
   reducerPath: 'formFieldApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:5172/api/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_API_BASE_URL }),
   tagTypes: ['FormField'],
   endpoints: (builder) => ({
     insertFormField: builder.mutation({

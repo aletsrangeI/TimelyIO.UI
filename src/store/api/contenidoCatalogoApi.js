@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const contenidoCatalogoApi = createApi({
   reducerPath: 'contenidoCatalogoApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:5172/api/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_API_BASE_URL }),
   tagTypes: ['ContenidoCatalogo'],
   endpoints: (builder) => ({
     insertContenido: builder.mutation({
@@ -47,6 +47,10 @@ export const contenidoCatalogoApi = createApi({
     countContenidos: builder.query({
       query: () => 'ContenidoCatalogo/Count',
     }),
+    getContenidoCatalogoByCatalogoId: builder.query({
+      query: (id) => `ContenidoCatalogo/GetContenidoCatalogoByCatalogoId/${id}`,
+      providesTags: ['ContenidoCatalogo'],
+    }),
   }),
 });
 
@@ -58,4 +62,5 @@ export const {
   useGetContenidoByIdQuery,
   useGetContenidoWithPaginationQuery,
   useCountContenidosQuery,
+  useGetContenidoCatalogoByCatalogoId,
 } = contenidoCatalogoApi;

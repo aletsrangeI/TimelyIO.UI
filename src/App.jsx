@@ -8,6 +8,8 @@ import Team from "./scenes/team";
 import Contacts from "./scenes/contacts";
 import Invoices from "./scenes/invoices";
 import { useDispatch, useSelector } from "react-redux";
+import { ProtectedRoute, PublicRoute } from "./routes";
+import { Login } from "./scenes/login";
 
 
 function App() {
@@ -26,10 +28,33 @@ function App() {
           <main className="content">
             {isAuthenticated ? <Topbar /> : null}
             <Routes>
-              <Route path="/" element={<DashBoard />} />
-              <Route path="/team" element={<Team />} />
-              <Route path="/contacts" element={<Contacts />} />
-              <Route path="/invoices" element={<Invoices />} />
+
+              {/* Rutas protegidas para usuarios no autenticados */}
+
+              <Route
+                path="/login"
+                element={
+                  <PublicRoute>
+                    <Login />
+                  </PublicRoute>
+                }
+              />
+
+              <Route
+                path="/register"
+                element={
+                  <PublicRoute>
+                    {/* <Register /> */}
+                  </PublicRoute>
+                }
+              />
+
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<DashBoard />} />
+                <Route path="/team" element={<Team />} />
+                <Route path="/contacts" element={<Contacts />} />
+                <Route path="/invoices" element={<Invoices />} />
+              </Route>
             </Routes>
           </main>
         </div>

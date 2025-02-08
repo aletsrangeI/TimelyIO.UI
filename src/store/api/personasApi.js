@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const personasApi = createApi({
   reducerPath: 'personasApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:5172/api/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_API_BASE_URL }),
   tagTypes: ['Personas'],
   endpoints: (builder) => ({
     authenticatePerson: builder.mutation({
