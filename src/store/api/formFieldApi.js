@@ -47,6 +47,10 @@ export const formFieldApi = createApi({
     countFormFields: builder.query({
       query: () => 'FormField/Count',
     }),
+    getFormFieldByFormCatId: builder.query({
+      query: (id) => `FormField/GetFormFieldByFormCatId/${id}`,
+      providesTags: ['FormField'],
+    }),
   }),
 });
 
@@ -58,4 +62,5 @@ export const {
   useGetFormFieldByIdQuery,
   useGetFormFieldsWithPaginationQuery,
   useCountFormFieldsQuery,
+  useGetFormFieldByFormCatIdQuery,
 } = formFieldApi;

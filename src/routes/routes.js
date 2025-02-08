@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import { useGetContenidoCatalogoByCatalogoId } from '../store/api';
+import { useGetContenidoCatalogoByCatalogoIdQuery } from '../store/api';
 
 export const routes = () => {
-  const { data, isLoading, isError } = useGetContenidoCatalogoByCatalogoId(2);
+  const { data, isLoading, isError } = useGetContenidoCatalogoByCatalogoIdQuery(2);
   const [rutas, setRutas] = useState([]);
 
   useEffect(() => {

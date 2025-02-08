@@ -62,5 +62,5 @@ export const {
   useGetContenidoByIdQuery,
   useGetContenidoWithPaginationQuery,
   useCountContenidosQuery,
-  useGetContenidoCatalogoByCatalogoId,
+  useGetContenidoCatalogoByCatalogoIdQuery,
 } = contenidoCatalogoApi;
