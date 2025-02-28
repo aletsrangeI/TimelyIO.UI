@@ -1,32 +1,19 @@
 import * as Yup from 'yup';
-import { useGetFormFieldByFormCatIdQuery } from '../../../store/api';
 
-export const useLoginForm = (selectedUser = null) => {
-  // Obtener los campos del formulario desde la API
-  const { data: fields, error, isLoading, isFetching } = useGetFormFieldByFormCatIdQuery(1);
-
-  // Construir los valores iniciales y el esquema de validación
+export const useForm = (fields, fieldsLoading) => {
   const initialValues = {};
   const requiredFields = {};
 
   if (!fieldsLoading && fields?.data) {
     for (const input of fields.data) {
-      // Valores iniciales
-      initialValues[input.name] = selectedUser?.[input.name] || '';
+      let schema = Yup.string();
 
       if (input.name === 'password') {
         initialValues.password = '';
-        initialValues.confirmPassword = '';
+        initialValues.confirmPassword = ''; // Agregamos confirmPassword
       }
 
-      if (input.name === 'rol') {
-        initialValues.rol = selectedUser?.rolId || 0;
-      }
-
-      // Validaciones
       if (!input.validations) continue;
-
-      let schema = Yup.string();
 
       for (const validation of input.validations) {
         if (validation.type === 'required') {
@@ -40,18 +27,20 @@ export const useLoginForm = (selectedUser = null) => {
         if (validation.type === 'minLength') {
           schema = schema.min(validation.value || 2, `Mínimo de ${validation.value || 2} caracteres`);
         }
+
+        if (validation.type === 'phone') {
+          schema = schema.matches(/^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/, 'Número de teléfono no válido');
+        }
       }
+
       requiredFields[input.name] = schema;
     }
   }
 
-  // Esquema de validación
   const validationSchema = Yup.object({ ...requiredFields });
 
   return {
-    fields: fields?.data || [],
     initialValues,
     validationSchema,
-    isLoading: fieldsLoading,
   };
 };

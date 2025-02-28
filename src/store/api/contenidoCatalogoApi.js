@@ -1,8 +1,19 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
+const baseQuery = fetchBaseQuery({
+  baseUrl: import.meta.env.VITE_API_BASE_URL,
+  prepareHeaders: (headers, { getState }) => {
+    const token = getState().auth.authToken;
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+    return headers;
+  },
+});
+
 export const contenidoCatalogoApi = createApi({
   reducerPath: 'contenidoCatalogoApi',
-  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_API_BASE_URL }),
+  baseQuery: baseQuery,
   tagTypes: ['ContenidoCatalogo'],
   endpoints: (builder) => ({
     insertContenido: builder.mutation({

@@ -1,74 +1,87 @@
 import { useDispatch } from "react-redux";
-import { useGetFormFieldByFormCatIdQuery } from "../../store/api";
-import * as Yup from "yup";
+import { useAuthenticatePersonMutation, useGetFormFieldByFormCatIdQuery } from "../../store/api";
 import { GenericForm } from "../global/GenericForm";
+import useLoginStyles from "./hooks/useLoginStyles";
+import { CircularProgress, Box, Alert } from "@mui/material";
+import { login } from "../../store/auth";
+import { useForm } from "../global/hooks/useForm";
 
-export const Login = ({ selectedUser = null }) => {
+export const Login = () => {
     const dispatch = useDispatch();
     const { data: fields, error, isLoading, isFetching } = useGetFormFieldByFormCatIdQuery(1);
+    const [authUser] = useAuthenticatePersonMutation();
+    const { initialValues, validationSchema } = useForm(fields, isLoading || isFetching);
+    const styles = useLoginStyles();
 
-    const initialValues = {};
-    const requiredFields = {};
+    const handleSubmit = async (values) => {
+        try {
+            const payload = {
+                email: values.email,
+                password: values.password
+            };
 
-    // Solo construir los valores iniciales y las validaciones si los datos están cargados
-    if (!isLoading && fields?.data) {
-        for (const input of fields.data) {
-            // Valores iniciales
-            initialValues[input.name] = selectedUser?.[input.name] || "";
+            console.log(payload);
 
-            if (input.name === "password") {
-                initialValues.password = "";
-                initialValues.confirmPassword = "";
+            const response = await authUser(payload).unwrap();
+
+            if (response.isSuccess) {
+                dispatch(login({
+                    userId: response.data.id,
+                    email: response.data.email,
+                    nombres: `${response.data.nombres} ${response.data.apellidos}`,
+                    token: response.data.token,
+                    expiresIn: 3600,
+                }));
+            } else {
+                alert(response.message || 'Error al iniciar sesión');
             }
 
-            if (input.name === "rol") {
-                initialValues.rol = selectedUser?.rolId || 0;
-            }
-
-            // Validaciones
-            if (!input.validations) continue;
-
-            let schema = Yup.string();
-
-            for (const validation of input.validations) {
-                if (validation.type === "required") {
-                    schema = schema.required("Este campo es requerido");
-                }
-
-                if (validation.type === "email") {
-                    schema = schema.email("Revise el formato del email");
-                }
-
-                if (validation.type === "minLength") {
-                    schema = schema.min(validation.value || 2, `Mínimo de ${validation.value || 2} caracteres`);
-                }
-            }
-            requiredFields[input.name] = schema;
+        } catch (error) {
+            console.error('Error de autenticación:', error);
+            alert(error.data?.message || 'Error al iniciar sesión');
         }
     }
 
-    // Creación del esquema de validación final
-    const validationSchema = Yup.object({ ...requiredFields });
+    if (isLoading || isFetching) {
+        return (
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+                <CircularProgress />
+            </Box>
+        );
+    }
 
-    // Renderiza solo si los datos están disponibles o cargando
+    if (error) {
+        return (
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+                <Alert severity="error">
+                    Error: {error.message}
+                </Alert>
+            </Box>
+        );
+    }
+
+    if (!fields?.data || fields.data.length === 0) {
+        return (
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+                <Alert severity="warning">
+                    No hay datos disponibles.
+                </Alert>
+            </Box>
+        );
+    }
+
     return (
         <>
-            {isLoading ? (
-                <p>Cargando...</p>
-            ) : error ? (
-                <p>Error: {JSON.stringify(error)}</p>
-            ) : fields?.data && fields.data.length ? (
-                <GenericForm
-                    formFields={fields.data} // Enviamos los campos como están
-                    initialValues={initialValues}
-                    validationSchema={validationSchema}
-                    submitButtonText="Iniciar Sesion"
-                    loading={isLoading}
-                    title="Timely"
-                />
-            ) : (
-                <p>No hay datos disponibles.</p>
-            )}
+            <GenericForm
+                formFields={fields.data}
+                initialValues={initialValues}
+                validationSchema={validationSchema}
+                submitButtonText="Iniciar Sesion"
+                loading={isLoading}
+                title="Timely"
+                styles={styles}
+                onSubmit={handleSubmit}
+            />
         </>
     );
 };
