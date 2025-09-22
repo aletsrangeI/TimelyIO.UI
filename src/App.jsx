@@ -7,11 +7,9 @@ import { Sidebar } from "./scenes/global/Sidebar";
 import Team from "./scenes/team";
 import Contacts from "./scenes/contacts";
 import Invoices from "./scenes/invoices";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { ProtectedRoute, PublicRoute } from "./routes";
 import { Login } from "./scenes/login";
-import { useEffect } from "react";
-import { login } from "./store/auth";
 import { Persons } from "./scenes/persons";
 import { Catalogos } from "./scenes/catalogos";
 
@@ -20,18 +18,6 @@ function App() {
   const [theme, colorMode] = useMode();
   const status = useSelector((state) => state.auth.status);
   const isAuthenticated = status === "authenticated";
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    const persistedState = localStorage.getItem("authState");
-    if (persistedState) {
-      const parsedState = JSON.parse(persistedState);
-
-      if (parsedState.status === "authenticated" && status !== "authenticated") {
-        dispatch(login(parsedState));
-      }
-    }
-  }, [dispatch, status]);
 
 
 
