@@ -1,37 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-// Cargar el estado inicial desde localStorage
-const loadState = () => {
-  try {
-    const serializedState = localStorage.getItem('authState');
-    if (serializedState === null) {
-      return undefined;
-    }
-    const state = JSON.parse(serializedState);
-
-    // Validar si el token ha expirado
-    if (state.expiration && new Date().getTime() > state.expiration) {
-      localStorage.removeItem('authState');
-      return undefined;
-    }
-
-    return state;
-  } catch (err) {
-    return undefined;
-  }
-};
-
-// Guardar el estado en localStorage
-const saveState = (state) => {
-  try {
-    const serializedState = JSON.stringify(state);
-    localStorage.setItem('authState', serializedState);
-  } catch (err) {
-    console.error('Error al guardar el estado:', err);
-  }
-};
-
-const initialState = loadState() || {
+const initialState = {
   status: 'unauthenticated',
   userId: null,
   email: null,
@@ -59,8 +28,6 @@ export const authSlice = createSlice({
       // Calcular la fecha de expiración del token (en milisegundos)
       state.expiration = new Date().getTime() + expirationDuration * 1000;
 
-      // Guardar el estado en localStorage
-      saveState(state);
     },
     logout: (state) => {
       state.status = 'unauthenticated';
@@ -70,9 +37,6 @@ export const authSlice = createSlice({
       state.photoURL = null;
       state.authToken = null;
       state.expiration = null;
-
-      // Limpiar el estado en localStorage
-      localStorage.removeItem('authState');
     },
     checkingCredentials: (state) => {
       state.status = 'checking';
